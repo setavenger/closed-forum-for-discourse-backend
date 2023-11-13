@@ -1,0 +1,35 @@
+# Use strong user password
+version: '3.1'
+
+services:
+  backend:
+    image: IMAGE_LINK
+    restart: unless-stopped
+    ports:
+      - "24356:8000"
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    networks:
+      - cfd-network
+
+  db:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: test_db
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    networks:
+      - cfd-network
+
+networks:
+  cfd-network:
+
+volumes:
+  pg-data:
