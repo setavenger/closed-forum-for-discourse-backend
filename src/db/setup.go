@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"os"
+	"strconv"
 )
 
 func Migrate(db *gorm.DB) error {
@@ -31,9 +32,14 @@ func Migrate(db *gorm.DB) error {
 
 func ConnectToPostgres() (db *gorm.DB, err error) {
 	host := os.Getenv("POSTGRES_HOST") // The service name of the PostgreSQL container defined in the docker-compose.yml file
-	port := 5432                       // Default PostgreSQL port
+	parsed, err := strconv.ParseUint(os.Getenv("POSTGRES_PORT"), 10, 64)
+	if err != nil {
+		common.ErrorLogger.Println(err)
+		return nil, err
+	}
+	port := parsed
 	user := os.Getenv("POSTGRES_USER")
-	dbname := "test_db"
+	dbname := os.Getenv("POSTGRES_DBNAME")
 	password := os.Getenv("POSTGRES_PASSWORD")
 	sslmode := "disable" // or "require" if SSL is enabled
 
@@ -41,6 +47,7 @@ func ConnectToPostgres() (db *gorm.DB, err error) {
 	connectionString := fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=%s",
 		host, port, user, dbname, password, sslmode)
 
+	common.DebugLogger.Println(connectionString)
 	// Open a connection to the database
 	db, err = gorm.Open(postgres.Open(connectionString), &gorm.Config{})
 	if err != nil {
