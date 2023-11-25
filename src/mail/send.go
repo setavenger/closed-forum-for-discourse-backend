@@ -28,7 +28,7 @@ func SendKeystoneToAllUsers(dBase *gorm.DB, subject string, keystone *common.Key
 		receivers = append(receivers, user.EMail)
 	}
 
-	receivers = []string{"setor.blagogee@gmx.de", "capital.snb@gmail.com", "setor@snblago.com"}
+	//receivers = []string{"setor.blagogee@gmx.de", "capital.snb@gmail.com", "setor@snblago.com"}
 	err = SendKeystoneEmail(dBase, receivers, subject, keystone, replyToID)
 	if err != nil {
 		common.ErrorLogger.Println(err)
@@ -98,7 +98,7 @@ func SendReflectionToAllUsers(dBase *gorm.DB, subject string, reflection *common
 		receivers = append(receivers, user.EMail)
 	}
 
-	receivers = []string{"setor.blagogee@gmx.de", "capital.snb@gmail.com", "setor@snblago.com"}
+	//receivers = []string{"setor.blagogee@gmx.de", "capital.snb@gmail.com", "setor@snblago.com"}
 	err = SendReflectionEmail(dBase, receivers, subject, reflection, replyToID)
 	if err != nil {
 		common.ErrorLogger.Println(err)
