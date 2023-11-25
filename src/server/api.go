@@ -178,15 +178,20 @@ func (d *Daemon) PostPublishReflection(c *gin.Context) {
 		return
 	}
 	mailingDetails, err := db.RetrieveLastMailingDetailsByKeystoneID(d.DB, reflection.KeystoneID)
-	if err != nil {
+	if err != nil && err.Error() != "record not found" {
 		common.ErrorLogger.Println(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "could not fetch last mailing details"})
 		return
 	}
 
+	var replyId string
+	if mailingDetails != nil {
+		replyId = mailingDetails.MailID
+	}
+
 	subject := fmt.Sprintf("REF: %d ID: %d - %s", reflection.ID, keystone.ID, keystone.Title)
 	go func() {
-		err = mail.SendReflectionToAllUsers(d.DB, subject, &reflection, mailingDetails.MailID)
+		err = mail.SendReflectionToAllUsers(d.DB, subject, &reflection, replyId)
 		if err != nil {
 			common.ErrorLogger.Println(err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
