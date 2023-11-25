@@ -6,7 +6,7 @@ services:
     image: IMAGE_LINK
     restart: unless-stopped
     ports:
-      - "24356:8000"
+      - "24356:24356"
     environment:
       POSTGRES_HOST: db
       POSTGRES_USER: root
