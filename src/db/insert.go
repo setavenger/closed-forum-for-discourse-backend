@@ -5,19 +5,19 @@ import (
 	"gorm.io/gorm"
 )
 
-func InsertUser(db *gorm.DB, user *common.User) error {
-	result := db.Create(user)
+//func InsertUser(db *gorm.DB, user *common.User) error {
+//	result := db.Create(user)
+//
+//	if result.Error != nil {
+//		return result.Error
+//	}
+//
+//	common.DebugLogger.Println("persisted user to db")
+//	return nil
+//}
 
-	if result.Error != nil {
-		return result.Error
-	}
-
-	common.DebugLogger.Println("persisted user to db")
-	return nil
-}
-
-func InsertKeystone(db *gorm.DB, user *common.Keystone) error {
-	result := db.Create(user)
+func InsertKeystone(db *gorm.DB, keystone *common.Keystone) error {
+	result := db.Create(keystone)
 
 	if result.Error != nil {
 		return result.Error
@@ -27,8 +27,19 @@ func InsertKeystone(db *gorm.DB, user *common.Keystone) error {
 	return nil
 }
 
-func InsertReflection(db *gorm.DB, user *common.Reflection) error {
-	result := db.Create(user)
+func InsertReflection(db *gorm.DB, reflection *common.Reflection) error {
+	result := db.Create(reflection)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	common.DebugLogger.Println("persisted reflection to db")
+	return nil
+}
+
+func InsertMailDetails(db *gorm.DB, info *common.MailingDetails) error {
+	result := db.Create(info)
 
 	if result.Error != nil {
 		return result.Error

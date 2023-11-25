@@ -3,6 +3,7 @@ package main
 import (
 	"backend/src/common"
 	"backend/src/db"
+	"backend/src/mail"
 	"backend/src/server"
 	"fmt"
 	"io"
@@ -16,13 +17,14 @@ import (
 func init() {
 	err := os.Mkdir("./logs", 0750)
 	if err != nil && !strings.Contains(err.Error(), "file exists") {
-		fmt.Println(err.Error())
-		log.Fatal(err)
+		common.ErrorLogger.Println(err.Error())
+		return
 	}
 
 	file, err := os.OpenFile(fmt.Sprintf("./logs/logs-%s.txt", time.Now()), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
-		log.Fatal(err)
+		common.ErrorLogger.Println(err)
+		return
 	}
 
 	multi := io.MultiWriter(file, os.Stdout)
@@ -32,6 +34,15 @@ func init() {
 	common.WarningLogger = log.New(multi, "[WARNING] ", log.Ldate|log.Lmicroseconds|log.Lshortfile|log.Lmsgprefix)
 	common.ErrorLogger = log.New(multi, "[ERROR] ", log.Ldate|log.Lmicroseconds|log.Lshortfile|log.Lmsgprefix)
 
+	mail.SmtpHost = os.Getenv("SMTP_HOST")
+	mail.SmtpPort = os.Getenv("SMTP_PORT")
+	mail.SmtpUser = os.Getenv("SMTP_USER")
+	mail.SmtpPass = os.Getenv("SMTP_PASS")
+
+	mail.ImapHost = os.Getenv("IMAP_HOST")
+	mail.ImapPort = os.Getenv("IMAP_PORT")
+	mail.ImapUser = mail.SmtpUser
+	mail.ImapPass = mail.SmtpPass
 }
 
 func main() {

@@ -3,6 +3,8 @@ package server
 import (
 	"backend/src/common"
 	"backend/src/db"
+	"backend/src/mail"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -42,7 +44,7 @@ func (d *Daemon) GetKeystone(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "could not parse id"})
 		return
 	}
-	keystone, err := db.RetrieveKeystone(d.DB, uint(id))
+	keystone, err := db.RetrieveKeystoneById(d.DB, uint(id))
 	if err != nil {
 		common.ErrorLogger.Println(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "could not fetch keystone"})
@@ -120,6 +122,16 @@ func (d *Daemon) PostPublishKeystone(c *gin.Context) {
 		return
 	}
 
+	subject := fmt.Sprintf("ID: %d - %s", keystone.ID, keystone.Title)
+	go func() {
+		err = mail.SendKeystoneToAllUsers(d.DB, subject, &keystone, "")
+		if err != nil {
+			common.ErrorLogger.Println(err)
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		common.InfoLogger.Println("Sent mails for keystone:", keystone.ID)
+	}()
 	c.JSON(http.StatusOK, gin.H{"result": "success"})
 	return
 }
@@ -159,6 +171,29 @@ func (d *Daemon) PostPublishReflection(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "could not insert new reflection"})
 		return
 	}
+	keystone, err := db.RetrieveKeystoneByIdFull(d.DB, reflection.KeystoneID)
+	if err != nil {
+		common.ErrorLogger.Println(err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "could not fetch related keystone"})
+		return
+	}
+	mailingDetails, err := db.RetrieveLastMailingDetailsByKeystoneID(d.DB, reflection.KeystoneID)
+	if err != nil {
+		common.ErrorLogger.Println(err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "could not fetch last mailing details"})
+		return
+	}
+
+	subject := fmt.Sprintf("REF: %d ID: %d - %s", reflection.ID, keystone.ID, keystone.Title)
+	go func() {
+		err = mail.SendReflectionToAllUsers(d.DB, subject, &reflection, mailingDetails.MailID)
+		if err != nil {
+			common.ErrorLogger.Println(err)
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		common.InfoLogger.Println("Sent mails for", keystone.Title)
+	}()
 
 	c.JSON(http.StatusOK, gin.H{"result": "success"})
 	return

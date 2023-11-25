@@ -11,6 +11,14 @@ services:
       POSTGRES_HOST: db
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
+      POSTGRES_PORT: "5432"
+      POSTGRES_DBNAME: test_db
+      SMTP_HOST: <your.smtp.host>
+      SMTP_PORT: 587
+      SMTP_USER: <user-email@example.com>
+      SMTP_PASS: <user_pass>
+      IMAP_HOST: <your.imap.host>
+      IMAP_PORT: 993
     networks:
       - cfd-network
 

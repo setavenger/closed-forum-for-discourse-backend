@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
 	"os"
 	"strconv"
 )
@@ -24,6 +23,10 @@ func Migrate(db *gorm.DB) error {
 		return err
 	}
 	err = db.AutoMigrate(&common.Reflection{})
+	if err != nil {
+		return err
+	}
+	err = db.AutoMigrate(&common.MailingDetails{})
 	if err != nil {
 		return err
 	}
@@ -51,7 +54,7 @@ func ConnectToPostgres() (db *gorm.DB, err error) {
 	// Open a connection to the database
 	db, err = gorm.Open(postgres.Open(connectionString), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err)
+		common.ErrorLogger.Fatal(err)
 	}
 	return
 }

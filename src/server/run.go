@@ -1,10 +1,10 @@
 package server
 
 import (
+	"backend/src/common"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"log"
 	"net/http"
 	"time"
 )
@@ -44,7 +44,7 @@ func RunServer(api *Daemon) {
 		authorized.POST("/new-reflection", api.PostPublishReflection)
 	}
 
-	if err := router.Run(":8000"); err != nil {
-		log.Fatal(err)
+	if err := router.Run(":24356"); err != nil {
+		common.ErrorLogger.Fatal(err)
 	}
 }
